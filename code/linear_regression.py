@@ -3,6 +3,7 @@
 import csv
 import numpy
 from sklearn import linear_model
+from sklearn.preprocessing import PolynomialFeatures
 
 # Load the principal components and target variables and test data
 data = numpy.genfromtxt('../data/spectra_princomp.csv', delimiter=',')
@@ -56,22 +57,23 @@ for i in range(len(test)):
 #train = numpy.concatenate((data,train_loc), axis=1)
 #testd = numpy.concatenate((test,test_loc), axis=1)
 
-# Fit linear model 1
+# Fit polynomial model 1
+poly = PolynomialFeatures(degree=2)
 regr1 = linear_model.LinearRegression()
-regr1.fit(train1,target1)
+regr1.fit(poly.fit_transform(train1),target1)
 
-# Fit linear model 2
+# Fit polynomial model 2
 regr2 = linear_model.LinearRegression()
-regr2.fit(train2,target2)
+regr2.fit(poly.fit_transform(train2),target2)
 
 # Get test predictions
-test_prediction1 = regr1.predict(test1)
+test_prediction1 = regr1.predict(poly.fit_transform(test1))
 tpr1 = test_prediction1.tolist()
-test_prediction2 = regr2.predict(test2)
+test_prediction2 = regr2.predict(poly.fit_transform(test2))
 tpr2 = test_prediction2.tolist()
 
 # Save to file with PIDN
-with open('../predictions/linear_regression_based_on_depth.csv','wb') as csvfile:
+with open('../predictions/polynomial_regression_based_on_depth.csv','wb') as csvfile:
 	datawriter = csv.writer(csvfile, delimiter=',')
 	datawriter.writerow(['PIDN', 'Ca', 'P', 'pH', 'SOC', 'Sand'])
 	for i in range(len(test_prediction1)):
