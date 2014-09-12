@@ -2,11 +2,10 @@
 
 import csv
 import numpy
-from sklearn.svm import SVR
+from sklearn.neighbors import KNeighborsRegressor
 from sklearn.cross_validation import KFold
 from mcrmse import compute_error
 import matplotlib.pyplot as plt
-from sklearn import tree
 
 # Load the principal components and target variables and test data
 data = numpy.genfromtxt('../data/spectra_princomp.csv', delimiter=',')
@@ -74,8 +73,8 @@ tt = numpy.concatenate((tr, tl), axis=1)
 for train,test in kf1:
 	er = []
 	for i in range(5):
-		svr = SVR(kernel='rbf', C=1, gamma=0.01)
-		prediction = svr.fit(tr[train], [row[i] for row in ta[train]]).predict(tr[test])
+		neigh = KNeighborsRegressor(n_neighbors=25, weights='distance')
+		prediction = neigh.fit(tr[train], [row[i] for row in ta[train]]).predict(tr[test])
 		er.append(compute_error(prediction, [row[i] for row in ta[test]]))
 	error.append(er)
 plt.plot(error)
@@ -95,8 +94,8 @@ tt = numpy.concatenate((tr, tl), axis=1)
 for train,test in kf2:
 	er = []
 	for i in range(5):
-		svr = SVR(kernel='rbf', C=1, gamma=0.01)
-		prediction = svr.fit(tt[train], [row[i] for row in ta[train]]).predict(tt[test])
+		neigh = KNeighborsRegressor(n_neighbors=25, weights='distance')
+		prediction = neigh.fit(tr[train], [row[i] for row in ta[train]]).predict(tr[test])
 		er.append(compute_error(prediction, [row[i] for row in ta[test]]))
 	error.append(er)
 plt.plot(error)
@@ -110,18 +109,18 @@ print me
 tpr1 = []
 tpr2 = []
 for i in range(5):
-	svr1 = SVR(kernel='rbf', C=1, gamma=0.01)
-	svr1.fit(train1, [row[i] for row in target1])
-	tpr1.append(svr1.predict(test1))
-	svr2 = SVR(kernel='rbf', C=1, gamma=0.01)
-	svr2.fit(train2, [row[i] for row in target2])
-	tpr2.append(svr2.predict(test2))
+	neigh1 = KNeighborsRegressor(n_neighbors=10, weights='distance')
+	neigh1.fit(train1, [row[i] for row in target1])
+	tpr1.append(neigh1.predict(test1))
+	neigh2 = KNeighborsRegressor(n_neighbors=5)
+	neigh2.fit(train2, [row[i] for row in target2])
+	tpr2.append(neigh2.predict(test2))
 tp1 = numpy.asarray(tpr1).transpose().tolist()
 tp2 = numpy.asarray(tpr2).transpose().tolist()
 
 # Save test outputs
 # Save to file with PIDN
-with open('../predictions/support_vector_regression.csv','wb') as csvfile:
+with open('../predictions/knn.csv','wb') as csvfile:
         datawriter = csv.writer(csvfile, delimiter=',')
         datawriter.writerow(['PIDN', 'Ca', 'P', 'pH', 'SOC', 'Sand'])
         for i in range(len(tp1)):

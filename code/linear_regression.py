@@ -73,7 +73,7 @@ test_prediction2 = regr2.predict(poly.fit_transform(test2))
 tpr2 = test_prediction2.tolist()
 
 # Save to file with PIDN
-with open('../predictions/polynomial_regression_based_on_depth.csv','wb') as csvfile:
+with open('../predictions/polynomial_regression_based_on_depth_20comps.csv','wb') as csvfile:
 	datawriter = csv.writer(csvfile, delimiter=',')
 	datawriter.writerow(['PIDN', 'Ca', 'P', 'pH', 'SOC', 'Sand'])
 	for i in range(len(test_prediction1)):
